@@ -94,7 +94,39 @@ cache_element* head;                //pointer to the cache
 
 int cache_size=0;             //cache_size denotes the current size of the cache
 
+#define MAX_BLOCKED_HOSTS 100
+char blocked_hosts[MAX_BLOCKED_HOSTS][256];
+int num_blocked_hosts = 0;
 
+void load_blocklist() {
+    FILE *file = fopen("blocklist.txt", "r");
+    if (file == NULL) {
+        printf("No blocklist.txt found or unable to open. No hosts will be blocked.\n");
+        return;
+    }
+
+    char line[256];
+    while (fgets(line, sizeof(line), file)) {
+        // Remove newline character
+        line[strcspn(line, "\r\n")] = 0;
+        if (strlen(line) > 0 && num_blocked_hosts < MAX_BLOCKED_HOSTS) {
+            strcpy(blocked_hosts[num_blocked_hosts], line);
+            num_blocked_hosts++;
+        }
+    }
+    fclose(file);
+    printf("Loaded %d blocked hosts from blocklist.txt\n", num_blocked_hosts);
+}
+
+int is_blocked(char* host) {
+    if (host == NULL) return 0;
+    for (int i = 0; i < num_blocked_hosts; i++) {
+        if (strcmp(host, blocked_hosts[i]) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 int sendErrorMessage(int socket, int status_code)
 
@@ -613,15 +645,19 @@ void* thread_fn(void* socketNew)
 				if( request->host && request->path && (checkHTTPversion(request->version) == 1) )
 
 				{
+					if (is_blocked(request->host)) {
+						printf("Blocked request to %s\n", request->host);
+						sendErrorMessage(socket, 403);
+					} else {
+						bytes_send_client = handle_request(socket, request, buffer, tempReq);		// Handle GET request
 
-					bytes_send_client = handle_request(socket, request, buffer, tempReq);		// Handle GET request
+						if(bytes_send_client == -1)
 
-					if(bytes_send_client == -1)
+						{	
 
-					{	
+							sendErrorMessage(socket, 500);
 
-						sendErrorMessage(socket, 500);
-
+						}
 					}
 
 
@@ -735,6 +771,7 @@ int main(int argc, char * argv[]) {
 
 
 	printf("Setting Proxy Server Port : %d\n",port_number);
+	load_blocklist();
 
 
 
