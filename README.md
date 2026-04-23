@@ -5,19 +5,20 @@ This project is implemented using `C` and Parsing of HTTP referred from <a href 
 
 ## Index
 
-- [Project Theory](https://github.com/Lovepreet-Singh-LPSK/MultiThreadedProxyServerClient#project-theory)
-- [How to Run](https://github.com/Lovepreet-Singh-LPSK/MultiThreadedProxyServerClient#How-to-Run)
-- [Demo](https://github.com/Lovepreet-Singh-LPSK/MultiThreadedProxyServerClient#Demo)
-- [Contributing](https://github.com/Lovepreet-Singh-LPSK/MultiThreadedProxyServerClient#contributing)
+- [Project Theory](https://github.com/uddiGitHub/MultiThreadedProxyServerClient#project-theory)
+- [How to Run](https://github.com/uddiGitHub/MultiThreadedProxyServerClient#How-to-Run)
+- [Demo](https://github.com/uddiGitHub/MultiThreadedProxyServerClient#Demo)
+- [Contributors](https://github.com/uddiGitHub/MultiThreadedProxyServerClient#Contributors)
+- [Contributing](https://github.com/uddiGitHub/MultiThreadedProxyServerClient#contributing)
 
 ## Project Theory
 
-[[Back to top]](https://github.com/Lovepreet-Singh-LPSK/MultiThreadedProxyServerClient#index)
+[[Back to top]](https://github.com/uddiGitHub/MultiThreadedProxyServerClient#index)
 
 ##### Introduction
 
 ##### Basic Working Flow of the Proxy Server:
-![](https://github.com/Lovepreet-Singh-LPSK/MultiThreadedProxyServerClient/blob/main/pics/UML.JPG)
+![](https://github.com/uddiGitHub/MultiThreadedProxyServerClient/blob/main/pics/UML.JPG)
 
 ##### How did we implement Multi-threading?
 - Used Semaphore instead of Condition Variables and pthread_join() and pthread_exit() function. 
@@ -43,13 +44,16 @@ This project is implemented using `C` and Parsing of HTTP referred from <a href 
 - Semaphore
 - Cache (LRU algorithm is used in it)
 
+##### Access Control (Firewall)
+- We implemented a blocklist feature that restricts users from accessing specific websites.
+- A `blocklist.txt` file is loaded into memory when the server starts. Any HTTP request for a domain listed in this file is intercepted, and the proxy directly responds with a `403 Forbidden` error page.
+
 ##### Limitations ​
 - If a URL opens multiple clients itself, then our cache will store each client’s response as a separate element in the linked list. So, during retrieval from the cache, only a chunk of response will be send and the website will not open
 - Fixed size of cache element, so big websites may not be stored in cache. 
 
 ##### How this project can be extended? ​
 - This code can be implemented using multiprocessing that can speed up the process with parallelism.
-- We can decide which type of websites should be allowed by extending the code.
 - We can implement requests like POST with this code.
 
 
@@ -60,26 +64,31 @@ This project is implemented using `C` and Parsing of HTTP referred from <a href 
 ## How to Run
 
 ```bash
-$ git clone https://github.com/Lovepreet-Singh-LPSK/MultiThreadedProxyServerClient.git
+$ git clone https://github.com/uddiGitHub/MultiThreadedProxyServerClient.git
 $ cd MultiThreadedProxyServerClient
 $ make all
 $ ./proxy <port no.>
 ```
-`Open http://localhost:port/https://www.cs.princeton.edu/`
-
-# Note:
-- This code can only be run in Linux Machine. Please disable your browser cache.
-- To run the proxy without cache Change the name of the file (`proxy_server_with_cache.c to proxy_server_without_cache.c`) MakeFile.
+**Note:**
+- This code can only be run in Linux or MacOS Machine. Please disable your browser cache.
+- To run the proxy without cache, change the name of the file in the Makefile (`proxy_server_with_cache.c` to `proxy_server_without_cache.c`).
 
 ## Demo
-![](https://github.com/Lovepreet-Singh-LPSK/MultiThreadedProxyServerClient/blob/main/pics/cache.png)
+![](https://github.com/uddiGitHub/MultiThreadedProxyServerClient/blob/main/pics/cache.png)
+
 - When website is opened for the first time (`url not found`) then cache will be miss.
 - Then if you again open that website again then `Data is retrieved from the cache` will be printed.
 
+## Contributors
+
+| Contributor | GitHub | Contributions |
+| :--- | :--- | :--- |
+| **Lovepreet Singh** | [Lovepreet-Singh-LPSK](https://github.com/Lovepreet-Singh-LPSK) | Original proxy server implementation (multi-threading, LRU caching, HTTP parsing) |
+| **Uddipta Deka** | [uddiGitHub](https://github.com/uddiGitHub) | Implemented Firewall / Access Control feature: `blocklist.txt` loading, hostname blocking via `is_blocked()` check, and `403 Forbidden` response before request forwarding. Applied to both `proxy_server_with_cache.c` and `proxy_server_without_cache.c`. |
+
 ## Contributing
+[Back to top](#index)
 
-[[Back to top]](https://github.com/Lovepreet-Singh-LPSK/MultiThreadedProxyServerClient#index)
-
-Feel free to add some useful. You can see `How this code can be extended`. Use ideas from there and feel free to fork and CHANGE. 
+Feel free to add some useful. You can see `How this code can be extended`. Use ideas from there and feel free to fork and CHANGE.
 
 #### Enjoy CODE and pull requests are highly appreciated.
